@@ -12,6 +12,12 @@ The plugin was designed for PBS Professional 19 and uses the modern PBS `select`
 
 Before the package is published, clone the repository and install it privately with Pixi:
 
+```bash
+pixi add --pypi "snakemake-executor-plugin-pbs @ git+https://github.com/jasonho1308/snakemake-executor-plugin-pbs"
+```
+
+or
+
 ```console
 git clone https://github.com/jasonho1308/snakemake-executor-plugin-pbs.git
 cd snakemake-executor-plugin-pbs
