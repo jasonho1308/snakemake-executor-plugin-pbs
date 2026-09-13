@@ -117,9 +117,11 @@ snakemake --executor pbs --jobs 50 \
   --pbs-pixi-environment dev
 ```
 
-The compute nodes must have `pixi` available. The plugin runs the generated
-jobscript with `pixi run --environment dev --frozen --executable`, so the
-workspace lock file must be up to date and accessible on the shared filesystem.
+The `pixi` executable found on the submission host must be accessible at the
+same absolute path on compute nodes. The plugin writes that path into the launcher
+and runs the generated jobscript with `pixi run --environment dev --frozen
+--executable`, so the workspace lock file must also be up to date and accessible
+on the shared filesystem.
 
 ### Legacy resource syntax
 

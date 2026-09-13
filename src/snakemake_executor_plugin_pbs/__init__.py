@@ -5,6 +5,7 @@
 import asyncio
 import re
 import shlex
+import shutil
 from collections.abc import AsyncGenerator
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -233,8 +234,13 @@ def _write_job_launcher(
     launcher = Path(f"{jobscript}.pbs")
     command = shlex.quote(str(jobscript))
     if pixi_environment is not None:
+        pixi_executable = shutil.which("pixi")
+        if pixi_executable is None:
+            raise WorkflowError(
+                "--pbs-pixi-environment requires pixi to be available on PATH"
+            )
         command = (
-            "pixi run --environment "
+            f"{shlex.quote(pixi_executable)} run --environment "
             f"{shlex.quote(pixi_environment)} --frozen --executable {command}"
         )
     launcher.write_text(

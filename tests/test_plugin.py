@@ -304,6 +304,12 @@ def test_executor_runs_jobscript_in_configured_pixi_environment(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.chdir(tmp_path)
+    bin_dir = tmp_path / "shared bin"
+    bin_dir.mkdir()
+    pixi = bin_dir / "pixi"
+    pixi.write_text("#!/bin/sh\n")
+    pixi.chmod(0o700)
+    monkeypatch.setenv("PATH", str(bin_dir))
     client = FakePbsClient()
     executor = make_executor(client)
     executor.executor_settings = ExecutorSettings(pixi_environment="dev")
@@ -324,7 +330,7 @@ def test_executor_runs_jobscript_in_configured_pixi_environment(
     assert launcher.read_text() == (
         "#!/bin/sh\n"
         f"cd {shlex.quote(str(tmp_path))} || exit 1\n"
-        f"exec pixi run --environment dev --frozen --executable "
+        f"exec {shlex.quote(str(pixi))} run --environment dev --frozen --executable "
         f"{shlex.quote(str(jobscript))}\n"
     )
 

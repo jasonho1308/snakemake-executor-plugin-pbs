@@ -9,6 +9,7 @@ This project follows [Semantic Versioning](https://semver.org/).
 ### Fixed
 
 - Start PBS jobs in Snakemake's working directory instead of the user's home directory.
+- Use Pixi's absolute path in PBS launchers so jobs do not depend on PBS exporting the submission `PATH`.
 
 ### Added
 
