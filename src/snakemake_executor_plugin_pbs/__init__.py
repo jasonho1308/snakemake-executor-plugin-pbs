@@ -42,9 +42,7 @@ class ExecutorSettings(ExecutorSettingsBase):
     qdel: Optional[str] = field(
         default="qdel", metadata={"help": "Path to the qdel executable."}
     )
-    queue: Optional[str] = field(
-        default=None, metadata={"help": "Default PBS queue."}
-    )
+    queue: Optional[str] = field(default=None, metadata={"help": "Default PBS queue."})
     account: Optional[str] = field(
         default=None, metadata={"help": "Default PBS account or project."}
     )
