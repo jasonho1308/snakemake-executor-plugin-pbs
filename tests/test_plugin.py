@@ -300,6 +300,35 @@ def test_executor_submits_a_job_with_standard_snakemake_resources(
     assert submitted[0].external_jobid == "99.server"
 
 
+def test_executor_runs_jobscript_in_configured_pixi_environment(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    client = FakePbsClient()
+    executor = make_executor(client)
+    executor.executor_settings = ExecutorSettings(pixi_environment="dev")
+    jobscript = tmp_path / "job.sh"
+    executor.get_jobscript = lambda job: str(jobscript)
+    executor.get_jobname = lambda job: "job"
+    executor.write_jobscript = lambda job, path: Path(path).write_text("#!/bin/sh\n")
+    executor.report_job_submission = lambda job: None
+    job = SimpleNamespace(
+        threads=1,
+        resources={},
+        logfile_suggestion=lambda prefix: str(Path(prefix) / "job"),
+    )
+
+    executor.run_job(job)
+
+    launcher = Path(f"{jobscript}.pbs")
+    assert launcher.read_text() == (
+        "#!/bin/sh\n"
+        f"cd {shlex.quote(str(tmp_path))} || exit 1\n"
+        f"exec pixi run --environment dev --frozen --executable "
+        f"{shlex.quote(str(jobscript))}\n"
+    )
+
+
 @pytest.mark.asyncio
 async def test_executor_reports_terminal_states_and_yields_active_jobs() -> None:
     client = FakePbsClient(
@@ -371,6 +400,7 @@ def test_snakemake_cli_registers_pbs_settings() -> None:
 
     assert result.returncode == 0, result.stderr
     assert "--pbs-qsub" in result.stdout
+    assert "--pbs-pixi-environment" in result.stdout
 
 
 def test_plugin_declares_a_shared_filesystem_executor() -> None:

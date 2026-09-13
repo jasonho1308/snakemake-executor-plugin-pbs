@@ -64,6 +64,12 @@ class ExecutorSettings(ExecutorSettingsBase):
         default=False,
         metadata={"help": "Pass -V to qsub to export the submission environment."},
     )
+    pixi_environment: Optional[str] = field(
+        default=None,
+        metadata={
+            "help": "Run submitted jobs in this Pixi environment using pixi run."
+        },
+    )
     mail_user: Optional[str] = field(
         default=None, metadata={"help": "Email address for PBS notifications."}
     )
@@ -143,9 +149,11 @@ class Executor(RemoteExecutor):
         stderr = Path(f"{logfile}.err")
         stdout.parent.mkdir(parents=True, exist_ok=True)
         self.write_jobscript(job, str(jobscript))
-        launcher = _write_job_launcher(jobscript, Path.cwd())
-
         settings = cast(ExecutorSettings, self.executor_settings)
+        launcher = _write_job_launcher(
+            jobscript, Path.cwd(), pixi_environment=settings.pixi_environment
+        )
+
         try:
             external_jobid = self.pbs.submit(
                 JobSubmission(
@@ -219,12 +227,20 @@ class Executor(RemoteExecutor):
             self.logger.error(f"Failed to cancel PBS job {job_id}: {message}")
 
 
-def _write_job_launcher(jobscript: Path, working_directory: Path) -> Path:
+def _write_job_launcher(
+    jobscript: Path, working_directory: Path, pixi_environment: str | None = None
+) -> Path:
     launcher = Path(f"{jobscript}.pbs")
+    command = shlex.quote(str(jobscript))
+    if pixi_environment is not None:
+        command = (
+            "pixi run --environment "
+            f"{shlex.quote(pixi_environment)} --frozen --executable {command}"
+        )
     launcher.write_text(
         "#!/bin/sh\n"
         f"cd {shlex.quote(str(working_directory))} || exit 1\n"
-        f"exec {shlex.quote(str(jobscript))}\n"
+        f"exec {command}\n"
     )
     launcher.chmod(0o700)
     return launcher

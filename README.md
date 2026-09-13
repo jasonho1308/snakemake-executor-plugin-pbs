@@ -96,6 +96,7 @@ All settings are available as `--pbs-<name>` CLI options and equivalent profile 
 | `resource-mode` | `select` | `select` or legacy `nodes` syntax |
 | `default-walltime` | unset | `HH:MM:SS` fallback when `runtime` is absent |
 | `export-environment` | `false` | Add `-V`; enable only if compute jobs need the full submission environment |
+| `pixi-environment` | unset | Run each jobscript in the named Pixi environment |
 | `mail-user` | unset | PBS notification address |
 | `mail-events` | unset | PBS mail event letters, such as `abe` |
 | `extra-qsub-args` | unset | Shell-like string of additional `qsub` arguments; no shell is invoked |
@@ -108,6 +109,17 @@ Example with additional submission options:
 snakemake --executor pbs --jobs 50 \
   --pbs-extra-qsub-args="-r y"
 ```
+
+To run submitted jobs in a Pixi environment:
+
+```console
+snakemake --executor pbs --jobs 50 \
+  --pbs-pixi-environment dev
+```
+
+The compute nodes must have `pixi` available. The plugin runs the generated
+jobscript with `pixi run --environment dev --frozen --executable`, so the
+workspace lock file must be up to date and accessible on the shared filesystem.
 
 ### Legacy resource syntax
 
