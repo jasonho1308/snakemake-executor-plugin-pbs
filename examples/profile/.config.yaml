@@ -1,0 +1,21 @@
+executor: pbs
+jobs: 100
+latency-wait: 60
+
+# pbs-qsub: qsub
+# pbs-qstat: qstat
+# pbs-qdel: qdel
+# pbs-queue: workq
+# pbs-account: project-name
+# pbs-resource-mode: select # Use "nodes" only for legacy PBS/Torque.
+# pbs-default-walltime: "24:00:00"
+# pbs-export-environment: false
+# pbs-mail-user: user@example.org
+# pbs-mail-events: abe
+# pbs-extra-qsub-args: "-r y"
+# pbs-command-timeout: 60
+# pbs-status-attempts: 3
+
+default-resources:
+  - mem_mb=1024
+  - runtime=60

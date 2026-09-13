@@ -1,0 +1,82 @@
+[project]
+name = "snakemake-executor-plugin-pbs"
+version = "0.1.0"
+description = "A Snakemake executor plugin for PBS Professional and OpenPBS clusters."
+readme = "README.md"
+requires-python = ">=3.11,<4.0"
+license = "MIT"
+license-files = ["LICENSE"]
+keywords = ["snakemake", "pbs", "openpbs", "hpc", "workflow"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+dependencies = [
+  "snakemake-interface-common>=1.23.1,<2",
+  "snakemake-interface-executor-plugins>=9.4.0,<10",
+]
+
+[[project.authors]]
+name = "Ho Cheuk Hai Jason"
+email = "50993239+jasonho1308@users.noreply.github.com"
+
+[build-system]
+build-backend = "hatchling.build"
+requires = [ "hatchling",]
+
+[dependency-groups]
+dev = [ "ruff", "pytest", "pytest-cov", "pyrefly", "twine", "build", "snakemake", "pytest-asyncio>=1.4.0,<2",]
+
+[project.urls]
+Repository = "https://github.com/jasonho1308/snakemake-executor-plugin-pbs"
+Issues = "https://github.com/jasonho1308/snakemake-executor-plugin-pbs/issues"
+Changelog = "https://github.com/jasonho1308/snakemake-executor-plugin-pbs/blob/main/CHANGELOG.md"
+Documentation = "https://snakemake.github.io/snakemake-plugin-catalog/plugins/executor/pbs.html"
+
+[tool.pixi.workspace]
+channels = [ "conda-forge",]
+platforms = [ { platform = "linux-64", glibc = "2.17", linux = "3.10" }, { platform = "linux-aarch64", glibc = "2.17", linux = "3.10" }, "osx-64", "osx-arm64",]
+
+[tool.pixi.tasks]
+
+[tool.pixi.dependencies]
+python = "3.13.*"
+# Prefer conda-forge's glibc 2.17 build over PyPI's manylinux_2_28 wheel.
+cryptography = "*"
+
+[tool.coverage.run]
+branch = true
+source = ["snakemake_executor_plugin_pbs"]
+
+[tool.coverage.report]
+exclude_lines = ["pass", "\\.\\.\\."]
+fail_under = 90.0
+show_missing = true
+
+[tool.ruff]
+target-version = "py311"
+
+[tool.pixi.pypi-dependencies.snakemake-executor-plugin-pbs]
+path = "."
+editable = true
+
+[tool.pixi.environments.dev]
+features = [ "dev",]
+
+[tool.pixi.feature.dev.tasks]
+lint = "ruff check src tests"
+format = "ruff format src tests"
+typecheck = "pyrefly check src tests"
+coverage-report = "coverage report -m"
+test = "pytest --cov=snakemake_executor_plugin_pbs --cov-report=xml:coverage-report/coverage.xml --cov-report=term-missing tests"
+build = "python -m build"
+check-build = { cmd = "python -m twine check dist/*", depends-on = ["build"] }

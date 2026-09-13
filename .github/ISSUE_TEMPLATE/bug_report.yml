@@ -1,0 +1,32 @@
+name: Bug report
+description: Report incorrect PBS executor behavior
+title: "bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not include credentials, personal email addresses, or private cluster identifiers.
+  - type: input
+    id: version
+    attributes:
+      label: Plugin version
+    validations:
+      required: true
+  - type: input
+    id: pbs
+    attributes:
+      label: PBS implementation and version
+      placeholder: PBS Professional 19.0.0
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Observed and expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized scheduler output or logs
+      description: Remove usernames, email addresses, account names, hostnames, and credentials.

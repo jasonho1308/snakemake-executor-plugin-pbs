@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      release-created: ${{ steps.release.outputs.release_created }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          release-type: python
+          package-name: snakemake-executor-plugin-pbs
+
+  publish:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release-created == 'true' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/snakemake-executor-plugin-pbs
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v6
+
+      - name: Set up Pixi
+        uses: prefix-dev/setup-pixi@v0
+
+      - name: Build and verify distributions
+        run: pixi run -e dev check-build
+
+      - name: Publish to PyPI with trusted publishing
+        uses: pypa/gh-action-pypi-publish@release/v1
