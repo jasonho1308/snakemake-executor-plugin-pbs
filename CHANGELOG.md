@@ -8,6 +8,7 @@ This project follows [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- Allow dependency resolution with environments that pin `packaging==25.0` by supporting older compatible `snakemake-interface-common` releases.
 - Start PBS jobs in Snakemake's working directory instead of the user's home directory.
 - Use Pixi's absolute path in PBS launchers so jobs do not depend on PBS exporting the submission `PATH`.
 

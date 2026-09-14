@@ -21,7 +21,7 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
 dependencies = [
-  "snakemake-interface-common>=1.23.1,<2",
+  "snakemake-interface-common>=1.19.0,<2",
   "snakemake-interface-executor-plugins>=9.4.0,<10",
 ]
 
